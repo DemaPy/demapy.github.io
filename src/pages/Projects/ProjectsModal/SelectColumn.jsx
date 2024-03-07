@@ -21,7 +21,7 @@ export function SelectColumn({ value, onSelect, query, selectedNode }) {
   const { data: columns, isLoading, isError } = useColumns(query);
   const [open, setOpen] = useState(false);
 
-  const filter_columns = columns.filter(column => {
+  const filter_columns = columns?.filter(column => {
     if (selectedNode.tagName === "IMG" && column.type === "src") {
       return true
     }

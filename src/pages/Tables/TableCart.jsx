@@ -11,21 +11,11 @@ import { Link } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { useQueryClient } from "react-query";
 import { useColumns } from "@/hooks/columns/useColumns";
-import { CreateForm } from "@/components/CreateForm";
-import { SelectColumn } from "../Projects/ProjectsModal/SelectColumn";
 import { TableModel } from "../../hooks/tables/model";
 import { ColumnModel } from "../../hooks/columns/model";
 import { getActions } from "@/lib/actions";
 
-const TableCart = ({
-  item,
-  setIsModalOpen,
-  onUpdate,
-  isModalOpen,
-  table_id,
-  selectedNode,
-  table_key_id,
-}) => {
+const TableCart = ({ item }) => {
   const { toast } = useToast();
   const client = useQueryClient();
   const { useColumnCreate } = ColumnModel;
@@ -103,31 +93,6 @@ const TableCart = ({
       <CardFooter className="flex justify-between">
         <CardActions actions={actions} />
       </CardFooter>
-      <CreateForm
-        isLoading={false}
-        isOpen={isModalOpen}
-        setIsOpen={setIsModalOpen}
-        fields={[
-          {
-            id: 1,
-            name: "column_id",
-            label: "Column",
-            content: (form) => (
-              <SelectColumn
-                selectedNode={selectedNode}
-                query={`?${table_key_id}=${table_id}`}
-                onSelect={(column) => form.setValue("column_id", column)}
-                value={form.getValues("column_id")}
-              />
-            ),
-          },
-        ]}
-        onSubmit={onUpdate}
-        title={"Manage variable"}
-        description={
-          "Select column name for selected node " + selectedNode?.tagName
-        }
-      />
     </Card>
   );
 };

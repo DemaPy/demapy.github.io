@@ -12,6 +12,8 @@ import NotFound from "@/NotFound";
 import RenderTableList from "@/components/RenderTableList";
 import RenderProjectList from "@/components/RenderProjectList";
 import TemplateCardLoading from "./TemplateCardLoading";
+import { CreateForm } from "@/components/CreateForm";
+import { SelectColumn } from "../Projects/ProjectsModal/SelectColumn";
 
 const Template = () => {
   const ref = useRef();
@@ -79,9 +81,7 @@ const Template = () => {
 
   if (templateError) {
     return (
-      <ErrorPage
-        title={`Something went wrong while template loading...`}
-      />
+      <ErrorPage title={`Something went wrong while template loading...`} />
     );
   }
 
@@ -131,7 +131,8 @@ const Template = () => {
                   onClick={() => {
                     setIsOpen(true);
                     setName(template?.template_name);
-                  }}>
+                  }}
+                >
                   {template?.template_name}
                 </p>
               )
@@ -149,20 +150,39 @@ const Template = () => {
           />
           <RenderTableList
             isCreate={true}
-            table_key_id={"template_id"}
-            onUpdate={({ column_id }) => {
-              selectedNode.setAttribute("data-column-id", column_id);
-              mutateTemplate({ template_html: refHTML.current.innerHTML });
-              setIsModalOpen(false);
-            }}
-            selectedNode={selectedNode}
-            table_id={template.id}
-            setIsModalOpen={setIsModalOpen}
-            isModalOpen={isModalOpen}
             query={`?template_id=${template.id}`}
           />
         </div>
       </div>
+      <CreateForm
+        isLoading={false}
+        isOpen={isModalOpen}
+        setIsOpen={setIsModalOpen}
+        fields={[
+          {
+            id: 1,
+            name: "column_id",
+            label: "Column",
+            content: (form) => (
+              <SelectColumn
+                selectedNode={selectedNode}
+                query={`?template_id=${template.id}`}
+                onSelect={(column) => form.setValue("column_id", column)}
+                value={form.getValues("column_id")}
+              />
+            ),
+          },
+        ]}
+        onSubmit={({ column_id }) => {
+          selectedNode.setAttribute("data-column-id", column_id);
+          mutateTemplate({ template_html: refHTML.current.innerHTML });
+          setIsModalOpen(false);
+        }}
+        title={"Manage variable"}
+        description={
+          "Select column name for selected node " + selectedNode?.tagName
+        }
+      />
     </PageContainer>
   );
 };
