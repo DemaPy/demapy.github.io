@@ -58,6 +58,7 @@ const ProjectTemplatePreview = ({ project_id, template_id }) => {
 
     function handleNodeSelect(ev) {
       ev.preventDefault();
+      if (ref.current === ev.target) return;
       setIsOpen(true);
 
       const isId = ev.target.getAttribute("data-style-id");
@@ -100,7 +101,7 @@ const ProjectTemplatePreview = ({ project_id, template_id }) => {
         ref.current.removeEventListener("mouseout", handleNodeUnHighlight);
       }
     };
-  }, [IsTemplateLoading]);
+  }, [IsTemplateLoading, projectStyle, template]);
 
   useEffect(() => {
     const document = new DOMParser().parseFromString(
@@ -141,8 +142,6 @@ const ProjectTemplatePreview = ({ project_id, template_id }) => {
 
   let new_node = {};
   const handleStyle = (style) => {
-    Object.assign(selectedNode.node.style, style);
-
     new_node = {
       id: selectedNode.id,
       project_id: project_id,
@@ -150,13 +149,15 @@ const ProjectTemplatePreview = ({ project_id, template_id }) => {
       node_id: uuidv4(),
     };
 
-    handleProjectStyle(new_node);
     const updated_body = new DOMParser().parseFromString(
       ref.current.innerHTML,
       "text/html"
     ).body;
     const cleared_body = clear_body_from_style(updated_body, style);
-    handleUpdateTemplate(cleared_body.innerHTML);
+    handleProjectStyle(new_node, () => {
+      Object.assign(selectedNode.node.style, style);
+      handleUpdateTemplate(cleared_body.innerHTML);
+    });
   };
 
   const handleUpdateTemplate = async (body_with_data_attribute) => {
@@ -178,7 +179,7 @@ const ProjectTemplatePreview = ({ project_id, template_id }) => {
         });
       },
       onSettled: () => {
-        client.invalidateQueries(`project-styles?project_id=${project_id}`);
+        client.invalidateQueries(`project-styles-?project_id=${project_id}`);
       },
       onSuccess: () => {
         toast({
@@ -199,7 +200,7 @@ const ProjectTemplatePreview = ({ project_id, template_id }) => {
     }
   }
 
-  const handleProjectStyle = async (new_node) => {
+  const handleProjectStyle = async (new_node, cb) => {
     if (isExist) {
       updateProjectStyle(
         { ...new_node },
@@ -212,10 +213,13 @@ const ProjectTemplatePreview = ({ project_id, template_id }) => {
             });
           },
           onSettled: () => {
-            client.invalidateQueries(`project-styles?project_id=${project_id}`);
-            setIsOpen(true);
+            client.invalidateQueries(
+              `project-styles-?project_id=${project_id}`
+            );
+            setIsOpen(false);
           },
           onSuccess: () => {
+            cb();
             toast({
               variant: "success",
               title: "Success",
@@ -234,7 +238,8 @@ const ProjectTemplatePreview = ({ project_id, template_id }) => {
           });
         },
         onSettled: () => {
-          client.invalidateQueries("templates");
+          client.invalidateQueries(`project-styles?project_id=${project_id}`);
+          setIsOpen(false);
         },
         onSuccess: () => {
           toast({
@@ -274,19 +279,27 @@ const ProjectTemplatePreview = ({ project_id, template_id }) => {
         fields={[
           {
             id: 1,
-            name: "backgroundColor",
-            label: "Background color",
-            placeholder: "color",
+            name: "section_name",
+            label: "Section name",
+            placeholder: "name",
           },
           {
             id: 2,
+            name: "backgroundColor",
+            label: "Background color",
+            placeholder: "hex color: #ffffff",
+          },
+          {
+            id: 3,
             name: "color",
-            label: "Text color",
-            placeholder: "color",
+            label: "Font color",
+            placeholder: "hex color: #ffffff",
           },
         ]}
         title={"Create project style"}
-        description={"Enter style name background color and text color."}
+        description={
+          "Enter style section name background color and text color."
+        }
         onSubmit={handleStyle}
         isOpen={open}
         setIsOpen={setIsOpen}

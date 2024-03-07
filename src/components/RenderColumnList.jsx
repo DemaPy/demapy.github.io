@@ -9,8 +9,16 @@ import { useColumnCreate } from "@/hooks/columns/useColumnCreate";
 import { PlusCircle } from "lucide-react";
 import { useColumns } from "@/hooks/columns/useColumns";
 import { SelectType } from "@/pages/Projects/ProjectsModal/SelectType";
+import { useDataTables } from "@/hooks/dataTables/useDataTables";
+import { useDataTableUpdate } from "@/hooks/dataTables/useDataTableUpdate";
 
-const RenderColumnList = ({ query, key_name, key_value, table_id, ...props }) => {
+const RenderColumnList = ({
+  query,
+  key_name,
+  key_value,
+  table_id,
+  ...props
+}) => {
   const { toast } = useToast();
   const client = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,6 +31,15 @@ const RenderColumnList = ({ query, key_name, key_value, table_id, ...props }) =>
   const { data: isSlugExists, isLoading: isSlugExistsLoading } = useColumns(
     `?table_id=${table_id}&type=slug`
   );
+
+  const {
+    mutate: updateDataTable,
+    isLoading: isDataTableUpdateLoading,
+    isError: isDataTableUpdateError,
+  } = useDataTableUpdate();
+
+  const { data: dataTables } = useDataTables(`?table_id=${table_id}`);
+  console.log(dataTables);
 
   // component_id
   // TODO: add edit column (after column edit need to be done:
@@ -65,6 +82,33 @@ const RenderColumnList = ({ query, key_name, key_value, table_id, ...props }) =>
         setIsModalOpen(false);
       },
       onSuccess: () => {
+        const tables_to_update = dataTables.map((item) => ({
+          id: item.id,
+          data: { ...item.data, [new_column.header.toLowerCase()]: "" },
+        }));
+        for (const iterator of tables_to_update) {
+          updateDataTable(iterator, {
+            onError: () => {
+              toast({
+                variant: "destructive",
+                title: "Failed to update data item",
+                description: "Something went wrong",
+              });
+            },
+            onSettled: () => {
+              setIsModalOpen(false);
+              client.invalidateQueries("data-tables");
+            },
+            onSuccess: () => {
+              toast({
+                variant: "success",
+                title: "Success",
+                description: "Data item successfully updated",
+              });
+            },
+          });
+        }
+
         toast({
           variant: "success",
           title: "Success",

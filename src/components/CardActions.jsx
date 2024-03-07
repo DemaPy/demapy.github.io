@@ -20,11 +20,13 @@ const DesktopActions = ({ actions }) => {
     <div className="gap-2 items-center justify-start md:flex hidden">
       {actions.map((action) => (
         <Button
+          disabled={action.disabled}
           key={action.id}
           variant="outline"
           size="sm"
           className="bg-slate-950 rounded-md text-xs text-blue-300 hover:text-blue-600 flex items-center justify-center"
-          onClick={action.onClick}>
+          onClick={action.onClick}
+        >
           {"icon" in action && action.icon} {action.name}
         </Button>
       ))}
@@ -38,7 +40,8 @@ const MobileActions = ({ actions }) => {
       <DropdownMenuTrigger className="md:hidden block" asChild>
         <Button
           variant="secondary"
-          className="bg-slate-950 rounded-md text-xs text-blue-300 hover:text-blue-600">
+          className="bg-slate-950 rounded-md text-xs text-blue-300 hover:text-blue-600"
+        >
           Actions
         </Button>
       </DropdownMenuTrigger>
@@ -48,7 +51,8 @@ const MobileActions = ({ actions }) => {
             <Button
               disabled={action.disabled}
               onClick={action.onClick}
-              className="bg-slate-950 rounded-md text-xs text-blue-300 hover:text-blue-600 p-3 cursor-pointer">
+              className="bg-slate-950 rounded-md text-xs text-blue-300 hover:text-blue-600 p-3 cursor-pointer"
+            >
               {"icon" in action && action.icon} {action.name}
             </Button>
           </DropdownMenuItem>

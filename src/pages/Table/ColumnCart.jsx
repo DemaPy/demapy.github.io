@@ -148,6 +148,7 @@ const ColumnCart = ({ item }) => {
               {
                 id: 1,
                 name: "Duplicate",
+                disabled: isColumnCreateLoading || item.type === "slug",
                 icon: (
                   <>
                     {isColumnCreateLoading ? (
@@ -162,6 +163,7 @@ const ColumnCart = ({ item }) => {
               {
                 id: 2,
                 name: "Delete",
+                disabled: isColumnDeleteLoading || item.type === "slug",
                 icon: (
                   <>
                     {isColumnDeleteLoading ? (
@@ -176,6 +178,7 @@ const ColumnCart = ({ item }) => {
               {
                 id: 3,
                 name: "Edit",
+                disabled: item.type === "slug",
                 icon: <Edit className="w-4 h-4 mr-2" />,
                 onClick: () => setIsColumnModalOpen(true),
               },

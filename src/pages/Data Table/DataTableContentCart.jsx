@@ -10,11 +10,11 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { useDataTableDelete } from "@/hooks/dataTables/useDataTableDelete";
 import { useDataTableUpdate } from "@/hooks/dataTables/useDataTableUpdate";
-import { Edit, Loader, TrashIcon } from "lucide-react";
+import { getActions } from "@/lib/actions";
 import { useState } from "react";
 import { useQueryClient } from "react-query";
 
-const DataTableContentCart = ({ item, invalidateQuery }) => {
+const DataTableContentCart = ({ columns, item, invalidateQuery }) => {
   const { toast } = useToast();
   const client = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,7 +29,7 @@ const DataTableContentCart = ({ item, invalidateQuery }) => {
 
   const handleUpdate = async (data) => {
     const updated_slug = {
-      slug : data.slug,
+      slug: data.slug,
       data: data,
     };
     updateDataTable(updated_slug, {
@@ -76,6 +76,12 @@ const DataTableContentCart = ({ item, invalidateQuery }) => {
     });
   };
 
+  const actions = getActions("data_table_cart", {
+    isEdit: isDataTableUpdateLoading,
+    isDelete: onDeleteLoading,
+    setIsModalOpen: setIsModalOpen,
+    handleDataTableDelete: handleDataTableDelete,
+  });
   return (
     <>
       <Card className="md:max-w-[320px] w-full bg-neutral-900 hover:shadow-lg hover:bg-neutral-700 transition-all border-none">
@@ -93,38 +99,7 @@ const DataTableContentCart = ({ item, invalidateQuery }) => {
           </p>
         </CardContent>
         <CardFooter>
-          <CardActions
-            actions={[
-              {
-                id: 1,
-                name: "Edit",
-                icon: (
-                  <>
-                    {isDataTableUpdateLoading ? (
-                      <Loader className="h-4 w-4 animate-spin mr-2" />
-                    ) : (
-                      <Edit className="h-4 w-4 mr-2" />
-                    )}
-                  </>
-                ),
-                onClick: () => setIsModalOpen(true),
-              },
-              {
-                id: 2,
-                onClick: () => handleDataTableDelete(item.id),
-                icon: (
-                  <>
-                    {onDeleteLoading ? (
-                      <Loader className="animate-spin" />
-                    ) : (
-                      <TrashIcon className="w-4 h-4 mr-2" />
-                    )}
-                  </>
-                ),
-                name: "Delete",
-              },
-            ]}
-          />
+          <CardActions actions={actions} />
         </CardFooter>
       </Card>
       <CreateForm
@@ -132,10 +107,19 @@ const DataTableContentCart = ({ item, invalidateQuery }) => {
         isOpen={isModalOpen}
         setIsOpen={setIsModalOpen}
         fields={Object.entries(item.data).map(([key, value], i) => {
+          let type;
+          if (columns.find((column) => column.header === key)) {
+            type = "url";
+          }
+          if (key === "slug") {
+            type = "text";
+          }
+
           return {
             id: i,
             name: key,
             label: key,
+            type,
             value: value,
             placeholder: "enter " + key,
           };

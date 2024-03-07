@@ -3,6 +3,9 @@ import { Code2, View } from "lucide-react";
 import ChangeTemplate from "../pages/Templates/TemplateModal/ChangeTemplate";
 import { useEffect, useState } from "react";
 
+
+const accptedTags = ["a", "span", "p", "img"];
+
 const TemplatePreview = ({
   isLoading,
   onUpdate,
@@ -18,6 +21,8 @@ const TemplatePreview = ({
     if (!refHTML.current) return;
 
     function handleNodeSelect(ev) {
+      if (refHTML.current === ev.target) return;
+      if (!accptedTags.includes(ev.target.tagName.toLowerCase())) return;
       setIsModalOpen(true);
 
       if (ev.ctrlKey) {
@@ -33,7 +38,6 @@ const TemplatePreview = ({
       setSelectedNode(ev.target.parentElement);
     }
 
-    const accptedTags = ["a", "span", "p", "img"];
     function handleNodeHighlight(ev) {
       ev.preventDefault();
       if (refHTML.current === ev.target) return;

@@ -114,6 +114,7 @@ const TableCart = ({
             label: "Column",
             content: (form) => (
               <SelectColumn
+                selectedNode={selectedNode}
                 query={`?${table_key_id}=${table_id}`}
                 onSelect={(column) => form.setValue("column_id", column)}
                 value={form.getValues("column_id")}
@@ -124,7 +125,7 @@ const TableCart = ({
         onSubmit={onUpdate}
         title={"Manage variable"}
         description={
-          "Select column name for selected node " + selectedNode.tagName
+          "Select column name for selected node " + selectedNode?.tagName
         }
       />
     </Card>

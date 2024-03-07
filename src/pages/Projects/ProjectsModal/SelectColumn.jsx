@@ -17,9 +17,25 @@ import { useState } from "react";
 import { useColumns } from "@/hooks/columns/useColumns";
 import ColumnSelectSkeleton from "./ColumnSelectSkeleton";
 
-export function SelectColumn({ value, onSelect, query }) {
-  const { data: templates, isLoading, isError } = useColumns(query);
+export function SelectColumn({ value, onSelect, query, selectedNode }) {
+  const { data: columns, isLoading, isError } = useColumns(query);
   const [open, setOpen] = useState(false);
+
+  const filter_columns = columns.filter(column => {
+    if (selectedNode.tagName === "IMG" && column.type === "src") {
+      return true
+    }
+
+    if ((selectedNode.tagName === "P" || selectedNode.tagName === "SPAN") && column.type === "text") {
+      return true
+    }
+
+    if (selectedNode.tagName === "A" && column.type === "href") {
+      return true
+    }
+
+    return false
+  })
 
   if (isLoading) {
     return <ColumnSelectSkeleton />;
@@ -39,9 +55,10 @@ export function SelectColumn({ value, onSelect, query }) {
           className={cn(
             "w-full justify-between capitalize",
             !value && "text-muted-foreground"
-          )}>
+          )}
+        >
           {value
-            ? templates.find((template) => template.id === value)?.header
+            ? filter_columns.find((column) => column.id === value)?.header
             : "Select column"}
           <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -51,7 +68,7 @@ export function SelectColumn({ value, onSelect, query }) {
           <CommandInput placeholder="Search column..." className="h-9" />
           <CommandEmpty>No column found.</CommandEmpty>
           <CommandGroup>
-            {templates?.map((column) => {
+            {filter_columns?.map((column) => {
               if (column.type === "slug") return;
 
               return (
@@ -62,7 +79,8 @@ export function SelectColumn({ value, onSelect, query }) {
                   onSelect={() => {
                     onSelect(column.id);
                     setOpen(false);
-                  }}>
+                  }}
+                >
                   {column.header}
                   <CheckIcon
                     className={cn(

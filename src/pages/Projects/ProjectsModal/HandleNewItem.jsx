@@ -44,7 +44,8 @@ const HandleNewItem = ({ onSubmit, fields, isLoading }) => {
         className="flex flex-col gap-4 grow"
         onSubmit={form.handleSubmit((formData) =>
           validateFormInput(formData, onSubmit)
-        )}>
+        )}
+      >
         {fields.map((item) => {
           return (
             <FormField
@@ -55,7 +56,15 @@ const HandleNewItem = ({ onSubmit, fields, isLoading }) => {
                 <FormItem>
                   <FormLabel className="capitalize">{item.header}</FormLabel>
                   <FormControl>
-                    <Input placeholder={item.header.toLowerCase()} {...field} />
+                    <Input
+                      type={
+                        item.type === "text" || item.type === "slug"
+                          ? "text"
+                          : "url"
+                      }
+                      placeholder={item.header.toLowerCase()}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -67,7 +76,8 @@ const HandleNewItem = ({ onSubmit, fields, isLoading }) => {
           disabled={isLoading}
           type="submit"
           size="sm"
-          className="w-full mt-auto">
+          className="w-full mt-auto"
+        >
           {isLoading ? (
             <Loader2
               className={cn(" h-4 w-4", {

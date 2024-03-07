@@ -8,6 +8,7 @@ import ErrorPage from "@/ErrorPage";
 import { useComponent } from "@/hooks/components/useComponent";
 import { useTable } from "@/hooks/tables/useTable";
 import NotFound from "@/NotFound";
+import { useColumns } from "@/hooks/columns/useColumns";
 
 const DataTable = () => {
   // table id, id of the project or component
@@ -18,6 +19,7 @@ const DataTable = () => {
     isLoading: isTableLoading,
     isError: isTableError,
   } = useTable(table_id);
+  const { data: columns } = useColumns(`?table_id=${table_id}`);
   const {
     data: project,
     isError: IsProjectError,
@@ -67,6 +69,7 @@ const DataTable = () => {
     <PageContainer title={`Data table for ${name}`}>
       {project && (
         <RenderList
+          columns={columns}
           service={"data_tables"}
           query={`?project_id=${project.id}&table_id=${table_id}`}
           invalidateQuery={`?project_id=${project.id}&table_id=${table_id}`}
@@ -75,6 +78,7 @@ const DataTable = () => {
       )}
       {component && (
         <RenderList
+          columns={columns}
           service={"data_tables"}
           query={`?component_id=${component.id}&table_id=${table_id}`}
           invalidateQuery={`?component_id=${component.id}&table_id=${table_id}`}

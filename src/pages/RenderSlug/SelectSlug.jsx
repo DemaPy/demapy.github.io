@@ -29,7 +29,7 @@ const SelectSlug = ({ selectedSlug, setSelectedSlug, project_id }) => {
     );
   }
 
-  let slugs = Array.from(new Set(tables_slugs?.map((item) => item.data.slug)));
+  let slugs = Array.from(new Set(tables?.map((item) => item.slug)));
 
   return (
     <DropdownMenu>

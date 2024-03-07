@@ -22,7 +22,7 @@ const SlugList = ({ layout_id, project_id }) => {
     );
   }
 
-  let slugs = Array.from(new Set(tables?.map((item) => item.data.slug)));
+  let slugs = Array.from(new Set(tables?.map((item) => item.slug)));
 
   return (
     <RenderList

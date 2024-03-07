@@ -81,7 +81,7 @@ const ProjectStyleCart = ({ item, project_id }) => {
     <Card className="md:max-w-[320px] w-full bg-neutral-900 hover:shadow-lg hover:bg-neutral-700 transition-all border-none">
       <CardHeader>
         <CardTitle className="text-white hover:underline leading-snug">
-          {style.name}
+          {style.section_name}
         </CardTitle>
       </CardHeader>
       {style_data.map(([key, value]) => {
